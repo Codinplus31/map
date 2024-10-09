@@ -10,113 +10,33 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
-     <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_u526KrsuiifQOKBKNclFZYST5_XOvlE&loading=async&callback=initMap"></script> -->
-</head>
+  </head>
 <body>
     <div id="map" style="width: 600px; height: 400px; position: relative;"></div>
 
-    <!-- <iframe
-  width="600"
-  height="450"
-  style="border:0"
-  loading="lazy"
-  allowfullscreen
-  referrerpolicy="no-referrer-when-downgrade"
-  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB_u526KrsuiifQOKBKNclFZYST5_XOvlE
-    &q=Space+Needle,Seattle+WA">
-</iframe> -->
-<script src="data.js"></script>
+<script src="school.js"></script>
     <script>
-        // AIzaSyB_u526KrsuiifQOKBKNclFZYST5_XOvlE
-       async function getLocations(locations) {
-  const results = [];
-
-  for (const location of locations) {
-    try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${location.school}`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      // Filter for university entries (if desired)
-      if (data.length > 0) {
-        const universityResults = data.filter(entry => entry.type === 'university'  || entry.type === 'college'|| entry.type === 'school' ||  entry.type === 'polytechnic');
-
-        // Check if any universities were found
-        if (universityResults.length > 0) {
-          results.push(universityResults[0]); // Push only the first university result (adjust as needed)
-        } else {
-          console.warn(`No universities found for ${location.school}`);
-        }
-      } else {
-        console.warn(`No results found for ${location.school}`);
-      }
-    } catch (error) {
-      console.error("Error fetching location data for", location.school, error);
-    }
-  }
-
-  return results;
-}
-
-// Assuming you have the 'search' variable containing school information
-getLocations(search)
-  .then(universityData => {
-    // Process the universityData (array of JSON objects)
-    console.log(universityData); // University data for each location
-
-    // Download university data as JSON (if applicable)
-    if (universityData.length > 0) {
-      downloadJson(universityData);
-    } else {
-      console.warn('No universities found in search data.');
-    }
-  })
-  .catch(error => {
-    console.error("Error fetching or processing location data:", error);
-  });
-
-async function downloadJson(data) {
-  // Create a JSON object with the desired data
-  const jsonData = {
-    universities: data // Array of university data objects
-  };
-
-  // Convert JSON object to a string
-  const jsonString = JSON.stringify(jsonData, null, 2); // Optional: Indent for readability
-
-  // Create a blob
-  const blob = new Blob([jsonString], { type: 'application/json' });
-
-  // Create a URL for the blob
-  const url = URL.createObjectURL(blob);
-
-  // Create a link element and trigger a click event
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'university_data.json';
-  a.click();
-
-  // Revoke the URL to free up resources
-  URL.revokeObjectURL(url);
-}
-// fetch('data.json').then(e=> e.json()).then(e=> console.log(e))
         var map = L.map('map')
-        .setView([9.6000359, 7.9999721], 7); // Adjust center and zoom as needed
+        .setView([9.6000359, 7.9999721], 6); // Adjust center and zoom as needed
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 var educationalInstitutions = [
-    { name: "University of Benin", type: "University", lat: 6.33441425, lon: 5.599827113484077, lng: 5.613 },
-    // ... other institutions
+    ...search
 ];
-
+var customIcon = L.icon({
+    iconUrl: 'iconloc.png',
+    iconSize: [50, 50], // Adjust size if needed
+    // iconAnchor: [22, 94],
+    // popupAnchor: [-3, -76]
+});
+// var greenIcon = new LeafIcon({iconUrl: 'download-removebg-preview.png'});
 educationalInstitutions.forEach(function(institution) {
-    // map.setView([institution.lat, institution.lon], 13)
-    L.marker([institution.lat, institution.lon])
+   
+    L.marker([Number(institution.lat), Number(institution.lon)], {icon: customIcon})
         .bindPopup("<b>" + institution.name + "</b><br>" +
                    "Type: " + institution.type + "<br>" +
-                   "Address: " + institution.address + "<br>" +
-                   "<a href='" + institution.website + "'>Website</a>")
+                   "Address: " + institution.display_name + "<br>")
         .addTo(map);
 });
     </script>
