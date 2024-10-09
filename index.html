@@ -39,7 +39,7 @@
 
       // Filter for university entries (if desired)
       if (data.length > 0) {
-        const universityResults = data.filter(entry => entry.type === 'university');
+        const universityResults = data.filter(entry => entry.type === 'university'  || entry.type === 'college'|| entry.type === 'school' ||  entry.type === 'polytechnic');
 
         // Check if any universities were found
         if (universityResults.length > 0) {
